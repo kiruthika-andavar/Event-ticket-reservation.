@@ -21,7 +21,7 @@ A Next.js + TypeScript starter for an event marketplace. The UI includes event d
 5. Seed demo data: `npm run db:seed`
 6. Start: `npm run dev`
 
-Open http://localhost:3000.
+Open https://event-ticket-reservation-n58r.vercel.app/
 
 ## API routes
 
