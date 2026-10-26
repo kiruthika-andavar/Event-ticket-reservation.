@@ -1,0 +1,20 @@
+{
+  "info": {
+    "name": "Gatherly Event Ticket Reservation API",
+    "_postman_id": "9f7b74e1-8ef9-4e23-b7d9-gatherly-demo",
+    "description": "Starter collection. Replace IDs with seeded database IDs before testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "List published events", "request": { "method": "GET", "url": "{{baseUrl}}/api/events" } },
+    { "name": "Create 10-minute hold", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"userId\": \"REPLACE_USER_ID\",\n  \"eventId\": \"REPLACE_EVENT_ID\",\n  \"tierId\": \"REPLACE_TIER_ID\",\n  \"quantity\": 1\n}" }, "url": "{{baseUrl}}/api/reservations" } },
+    { "name": "Mock payment approve", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"REPLACE_ORDER_ID\",\n  \"outcome\": \"approve\"\n}" }, "url": "{{baseUrl}}/api/payments/mock" } },
+    { "name": "Mock payment reject", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"REPLACE_ORDER_ID\",\n  \"outcome\": \"reject\"\n}" }, "url": "{{baseUrl}}/api/payments/mock" } },
+    { "name": "Analytics", "request": { "method": "GET", "url": "{{baseUrl}}/api/analytics" } },
+    { "name": "Expire holds (protected)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{cronSecret}}" }], "url": "{{baseUrl}}/api/cron/expire-holds" } }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "cronSecret", "value": "replace-me" }
+  ]
+}

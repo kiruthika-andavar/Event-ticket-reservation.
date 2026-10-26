@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ORGANIZER
+  ATTENDEE
+}
+enum OrderStatus {
+  HELD
+  PENDING_PAYMENT
+  PAID
+  EXPIRED
+  CANCELLED
+  FAILED
+}
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      Role     @default(ATTENDEE)
+  createdAt DateTime @default(now())
+  events    Event[]  @relation("OrganizerEvents")
+  orders    Order[]
+}
+
+model Event {
+  id             String   @id @default(cuid())
+  organizerId    String
+  organizer      User     @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  title          String
+  description    String
+  category       String
+  venue          String
+  city           String
+  startsAt       DateTime
+  salesCutoffAt  DateTime
+  imageUrl       String?
+  published      Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  ticketTiers    TicketTier[]
+  orders         Order[]
+  @@index([published, startsAt])
+}
+
+model TicketTier {
+  id           String   @id @default(cuid())
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name         String
+  priceCents   Int
+  totalQty     Int
+  soldQty      Int      @default(0)
+  heldQty      Int      @default(0)
+  orders       Order[]
+  @@unique([eventId, name])
+  @@index([eventId])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  eventId     String
+  event       Event       @relation(fields: [eventId], references: [id])
+  tierId      String
+  tier        TicketTier  @relation(fields: [tierId], references: [id])
+  quantity    Int
+  totalCents  Int
+  status      OrderStatus @default(HELD)
+  holdExpiresAt DateTime
+  createdAt   DateTime    @default(now())
+  payment     Payment?
+  @@index([status, holdExpiresAt])
+  @@index([eventId, createdAt])
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  orderId     String        @unique
+  order       Order         @relation(fields: [orderId], references: [id])
+  amountCents Int
+  status      PaymentStatus @default(PENDING)
+  providerRef String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
